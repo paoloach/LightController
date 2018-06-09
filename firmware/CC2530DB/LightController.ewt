@@ -4211,9 +4211,6 @@
                 <file>
                     <name>$PROJ_DIR$\..\Source\clusters\ClusterPower.h</name>
                 </file>
-                <file>
-                    <name>$PROJ_DIR$\..\Source\clusters\ClusterTemperatureMeasurement.h</name>
-                </file>
             </group>
             <file>
                 <name>$PROJ_DIR$\..\Source\clusters\ClusterBasic.c</name>
@@ -4224,13 +4221,7 @@
             <file>
                 <name>$PROJ_DIR$\..\Source\clusters\ClusterPower.c</name>
             </file>
-            <file>
-                <name>$PROJ_DIR$\..\Source\clusters\ClusterTemperatureMeasurement.c</name>
-            </file>
         </group>
-        <file>
-            <name>$PROJ_DIR$\..\Source\OSAL_LightController.c</name>
-        </file>
         <file>
             <name>$PROJ_DIR$\..\Source\LightController.c</name>
         </file>
@@ -4239,6 +4230,9 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\Source\LightController_data.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Source\OSAL_LightController.c</name>
         </file>
     </group>
     <group>

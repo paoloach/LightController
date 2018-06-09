@@ -1,14 +1,4 @@
 
-/**************************************************************************************************
-
- DESCRIPTION:
-  --
-
- CREATED: 23/08/2016, by Paolo Achdjian
-
- FILE: TemperatureSensor.c
-
-***************************************************************************************************/
 
 
 /*********************************************************************
@@ -24,7 +14,7 @@
 #include "zcl_general.h"
 #include "zcl_ha.h"
 
-#include "TemperatureSensor.h"
+#include "LightController.h"
 
 #include "onboard.h"
 
@@ -35,14 +25,14 @@
 
 #include "clusters/ClusterIdentify.h"
 #include "clusters/ClusterBasic.h"
-#include "clusters/ClusterTemperatureMeasurement.h"
 #include "clusters/ClusterPower.h"
+#include "clusters/ClusterOSALEvents.h"
 
 #define FAST_BLINK_TIME_ON 100	 
 #define FAST_BLINK_TIME_OFF 1000	 
 	 
-byte temperatureSensorTaskID;
-extern SimpleDescriptionFormat_t temperatureSimpleDesc;
+byte lightControllerTaskID;
+extern SimpleDescriptionFormat_t litghControllerSimpleDesc;
 	
 // Functions to process ZCL Foundation incoming Command/Response messages 
 static void processIncomingMsh( zclIncomingMsg_t *msg );
@@ -80,25 +70,23 @@ __sfr __no_init volatile struct  {
 } @ 0xF3;
 
 
-void temperatureSensorInit( byte task_id ){
- 	temperatureSensorTaskID = task_id;
+void lightControllerInit( byte task_id ){
+ 	lightControllerTaskID = task_id;
 
    	zcl_registerPlugin( ZCL_CLUSTER_ID_GEN_BASIC,  ZCL_CLUSTER_ID_GEN_MULTISTATE_VALUE_BASIC,    handleClusterCommands );
   
-	zclHA_Init( &temperatureSimpleDesc );
+	zclHA_Init( &litghControllerSimpleDesc );
 	addReadAttributeFn(ENDPOINT, ZCL_CLUSTER_ID_GEN_BASIC,basicClusterReadAttribute);
 	addWriteAttributeFn(ENDPOINT, ZCL_CLUSTER_ID_GEN_BASIC,basicClusterWriteAttribute);
 	addReadAttributeFn(ENDPOINT, ZCL_CLUSTER_ID_GEN_IDENTIFY,identifyClusterReadAttribute);
 	addWriteAttributeFn(ENDPOINT, ZCL_CLUSTER_ID_GEN_IDENTIFY,identifyClusterWriteAttribute);
 	addReadAttributeFn(ENDPOINT,ZCL_CLUSTER_ID_GEN_POWER_CFG,powerClusterReadAttribute);
-	addReadAttributeFn(ENDPOINT,ZCL_CLUSTER_ID_MS_TEMPERATURE_MEASUREMENT,temperatureClusterReadAttribute);
 
-  	zcl_registerForMsg( temperatureSensorTaskID );
+  	zcl_registerForMsg( lightControllerTaskID );
   
   	EA=1;
-  	clusterTemperatureMeasurementeInit();
-	powerClusterInit(temperatureSensorTaskID);
- 	identifyInit(temperatureSensorTaskID);
+  	powerClusterInit(lightControllerTaskID);
+ 	identifyInit(lightControllerTaskID);
 	//ZMacSetTransmitPower(TX_PWR_PLUS_19);
 	ZMacSetTransmitPower(POWER);
 	DIR0_1 = 1;
@@ -108,12 +96,12 @@ void temperatureSensorInit( byte task_id ){
 }
 
 static void fastBlinkOn(void){
-	osal_start_timerEx( temperatureSensorTaskID, FAST_BLINK, FAST_BLINK_TIME_ON );
+	osal_start_timerEx( lightControllerTaskID, FAST_BLINK, FAST_BLINK_TIME_ON );
 	P0_1 = 1;
 }
 			   
 static void fastBlinkOff(void){
-	osal_stop_timerEx( temperatureSensorTaskID, FAST_BLINK );
+	osal_stop_timerEx( lightControllerTaskID, FAST_BLINK );
 	P0_1 = 0;
 }
 
@@ -126,13 +114,13 @@ static void fastBlinkOff(void){
  *
  * @return      none
  */
-uint16 temperatureSensorEventLoop( uint8 task_id, uint16 events ){
+uint16 lightControllerventLoop( uint8 task_id, uint16 events ){
 	afIncomingMSGPacket_t *MSGpkt;
 	devStates_t zclSampleSw_NwkState;
   
 	(void)task_id;  // Intentionally unreferenced parameter
 	if ( events & SYS_EVENT_MSG ){
-		while ( (MSGpkt = (afIncomingMSGPacket_t *)osal_msg_receive( temperatureSensorTaskID )) )  {
+		while ( (MSGpkt = (afIncomingMSGPacket_t *)osal_msg_receive( lightControllerTaskID )) )  {
 			switch ( MSGpkt->hdr.event ) {
 				case ZCL_INCOMING_MSG:
           			// Incoming ZCL Foundation command/response messages
@@ -160,10 +148,10 @@ uint16 temperatureSensorEventLoop( uint8 task_id, uint16 events ){
 	if ( events & FAST_BLINK ) {
 		if (P0_1){
 			P0_1 = 0;
-			osal_start_timerEx( temperatureSensorTaskID, FAST_BLINK, FAST_BLINK_TIME_OFF );
+			osal_start_timerEx( lightControllerTaskID, FAST_BLINK, FAST_BLINK_TIME_OFF );
 		}else{
 			P0_1 = 1;
-			osal_start_timerEx( temperatureSensorTaskID, FAST_BLINK, FAST_BLINK_TIME_ON );
+			osal_start_timerEx( lightControllerTaskID, FAST_BLINK, FAST_BLINK_TIME_ON );
 		}
 		
 		return events ^ FAST_BLINK;
@@ -174,10 +162,6 @@ uint16 temperatureSensorEventLoop( uint8 task_id, uint16 events ){
 		events = events ^ READ_BATTERY_LEVEL;
 	}
 	
-	if ( events & READ_TEMP_MASK ) {
-		return readTemperatureLoop(events);
-	}
-
  	return 0;
 }
 

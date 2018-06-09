@@ -25,7 +25,7 @@ if not "%~1" == "" goto debugFile
 
 @echo on 
 
-"C:\Program Files\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "E:\LIGHTCONTROLLER\firmware\CC2530DB\settings\LightController.EndDeviceEB.general.xcl" --backend -f "E:\LIGHTCONTROLLER\firmware\CC2530DB\settings\LightController.EndDeviceEB.driver.xcl" 
+"C:\Program Files\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "C:\Users\paolo\Documents\GitHub\LightController\firmware\CC2530DB\settings\LightController.EndDeviceEB.general.xcl" --backend -f "C:\Users\paolo\Documents\GitHub\LightController\firmware\CC2530DB\settings\LightController.EndDeviceEB.driver.xcl" 
 
 @echo off 
 goto end 
@@ -34,7 +34,7 @@ goto end
 
 @echo on 
 
-"C:\Program Files\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "E:\LIGHTCONTROLLER\firmware\CC2530DB\settings\LightController.EndDeviceEB.general.xcl" "--debug_file=%~1" --backend -f "E:\LIGHTCONTROLLER\firmware\CC2530DB\settings\LightController.EndDeviceEB.driver.xcl" 
+"C:\Program Files\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "C:\Users\paolo\Documents\GitHub\LightController\firmware\CC2530DB\settings\LightController.EndDeviceEB.general.xcl" "--debug_file=%~1" --backend -f "C:\Users\paolo\Documents\GitHub\LightController\firmware\CC2530DB\settings\LightController.EndDeviceEB.driver.xcl" 
 
 @echo off 
 :end

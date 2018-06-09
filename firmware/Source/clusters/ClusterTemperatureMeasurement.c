@@ -109,7 +109,7 @@ static uint8 reset(void);
 static void finalizeReadTemp(void);
 
 
-extern byte temperatureSensorTaskID;
+extern byte lightControllerTaskID;
 extern devStates_t devState;
 
 #define TIME_READ_ms 30*1000
@@ -131,7 +131,7 @@ void clusterTemperatureMeasurementeInit(void) {
 
 	countMinutes = 2*MINUTES_BETWEEN;
 	readTemperature();
-	osal_start_timerEx( temperatureSensorTaskID, READ_TEMP_EVT, TIME_READ_ms );
+	osal_start_timerEx( lightControllerTaskID, READ_TEMP_EVT, TIME_READ_ms );
 }
 
 void temperatureClusterReadAttribute(zclAttrRec_t * statusRec) {
