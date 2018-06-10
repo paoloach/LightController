@@ -4654,6 +4654,12 @@
                     <name>$PROJ_DIR$\..\Source\clusters\ClusterIdentify.h</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\Source\clusters\ClusterOccupancySensor.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\Source\clusters\ClusterOnOff.h</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\Source\clusters\ClusterOSALEvents.h</name>
                 </file>
                 <file>
@@ -4667,9 +4673,18 @@
                 <name>$PROJ_DIR$\..\Source\clusters\ClusterIdentify.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\Source\clusters\ClusterOccupancySensor.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Source\clusters\ClusterOnOff.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\Source\clusters\ClusterPower.c</name>
             </file>
         </group>
+        <file>
+            <name>$PROJ_DIR$\..\Source\clusters\bitIO.h</name>
+        </file>
         <file>
             <name>$PROJ_DIR$\..\Source\LightController.c</name>
         </file>

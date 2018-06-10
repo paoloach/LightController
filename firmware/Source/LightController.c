@@ -17,6 +17,7 @@
 #include "LightController.h"
 
 #include "onboard.h"
+#include "clusters/bitIO.h"
 
 /* HAL */
 #include "hal_lcd.h"
@@ -47,27 +48,9 @@ static uint8 processInDiscRspCmd( zclIncomingMsg_t *pInMsg );
 #endif
 static ZStatus_t handleClusterCommands( zclIncoming_t *pInMsg );
 
-__sfr __no_init volatile struct  {
-	unsigned char DIR0_0: 1;
-	unsigned char DIR0_1: 1;
-	unsigned char DIR0_2: 1;
-	unsigned char DIR0_3: 1;
-	unsigned char DIR0_4: 1;
-	unsigned char DIR0_5: 1;
-	unsigned char DIR0_6: 1;
-	unsigned char DIR0_7: 1;
-} @ 0xFD;
-
-__sfr __no_init volatile struct  {
-	unsigned char P0SEL_0: 1;
-	unsigned char P0SEL_1: 1;
-	unsigned char P0SEL_2: 1;
-	unsigned char P0SEL_3: 1;
-	unsigned char P0SEL_4: 1;
-	unsigned char P0SEL_5: 1;
-	unsigned char P0SEL_6: 1;
-	unsigned char P0SEL_7: 1;
-} @ 0xF3;
+#define LED_DIR	DIR0_4
+#define LED_SEL P0SEL_4
+#define LED	P0_4
 
 
 void lightControllerInit( byte task_id ){
@@ -89,20 +72,20 @@ void lightControllerInit( byte task_id ){
  	identifyInit(lightControllerTaskID);
 	//ZMacSetTransmitPower(TX_PWR_PLUS_19);
 	ZMacSetTransmitPower(POWER);
-	DIR0_1 = 1;
- 	P0SEL_1 = 0;
- 	P0_1 = 0;
+	LED_DIR = 1;
+ 	LED_SEL = 0;
+ 	LED = 0;
 	fastBlinkOn();
 }
 
 static void fastBlinkOn(void){
 	osal_start_timerEx( lightControllerTaskID, FAST_BLINK, FAST_BLINK_TIME_ON );
-	P0_1 = 1;
+	LED = 1;
 }
 			   
 static void fastBlinkOff(void){
 	osal_stop_timerEx( lightControllerTaskID, FAST_BLINK );
-	P0_1 = 0;
+	LED = 0;
 }
 
 /*********************************************************************
@@ -147,10 +130,10 @@ uint16 lightControllerventLoop( uint8 task_id, uint16 events ){
 	
 	if ( events & FAST_BLINK ) {
 		if (P0_1){
-			P0_1 = 0;
+			LED = 0;
 			osal_start_timerEx( lightControllerTaskID, FAST_BLINK, FAST_BLINK_TIME_OFF );
 		}else{
-			P0_1 = 1;
+			LED = 1;
 			osal_start_timerEx( lightControllerTaskID, FAST_BLINK, FAST_BLINK_TIME_ON );
 		}
 		

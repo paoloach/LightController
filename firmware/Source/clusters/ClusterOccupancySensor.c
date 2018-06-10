@@ -11,13 +11,12 @@
 
 #include "ClusterOccupancySensor.h"
 #include "zcl.h"
-#include "bitIO.h"
 #include "ioCC2530.h"
 #include "ClusterOSALEvents.h"
 #include "hal_mcu.h"
 #include "zcl_general.h"
 #include "AddrMgr.h"
-#include "PresenceSensor.h"
+#include "bitIO.h"
 
 static uint8 occupancy=0;
 static uint16 occCounter;
@@ -27,7 +26,15 @@ static uint16 unoccupiedToOccupied=0;
 static uint8  unoccupiedToOccupiedThreshold=1;
 static uint16 mainAppTaskId;
 
-// Input pin P0_2
+#define SENSOR_IN	P0_0
+#define SENSOR_DIR DIR0_0
+#define SENSOR_SEL	P0SEL_0
+#define SENSOR_IEN  P0IEN_0
+#define SENSOR_IF   P0IF0
+#define SENSOR_IPORT P0ICON
+#define SENSOR_IPORT_ENABLE P0IE
+
+
 
 static void sendCmdToBindDevices(uint8 cmd);
 
@@ -39,13 +46,12 @@ void occupancyClusterInit(uint16 taskId ) {
 	unoccupiedToOccupied=0;
 	unoccupiedToOccupiedThreshold=1;
 	
-	P0SEL_2 =0;
-	DIR0_2=0;
-	P0IFG=0;
-	P0IF=0;
-	PICTL=0;
-	P0IEN_2=1;
-	P0IE = 1;
+	SENSOR_SEL =0;
+	SENSOR_DIR=0;
+	SENSOR_IF=0;
+	SENSOR_IPORT=0;
+	SENSOR_IEN=1;
+	SENSOR_IPORT_ENABLE = 1;
 	EA=1;
 }
 
@@ -122,6 +128,7 @@ void occupancyOff(void){
 }
 
 void sendCmdToBindDevices(uint8 cmd){
+	/*
 	BindingEntry_t * bindEntry;
 	bindEntry = bindFind(ENDPOINT_ONOFF_SWITCH, ZCL_CLUSTER_ID_GEN_ON_OFF,0);
 	if( bindEntry){
@@ -137,32 +144,18 @@ void sendCmdToBindDevices(uint8 cmd){
 			zcl_SendCommand(ENDPOINT_ONOFF_SWITCH, &onOffSendaddr, ZCL_CLUSTER_ID_GEN_ON_OFF,cmd, TRUE, ZCL_FRAME_CLIENT_SERVER_DIR, TRUE, 0, 0, 0,NULL);
 		}
 	}
+*/
 }
 
 HAL_ISR_FUNCTION(occupancySensor_ISR, P0INT_VECTOR){
 	HAL_ENTER_ISR();
-	if (P0IF2){
-		if (P0ICON == 0){
-			occCounter++;
-			if (occCounter >= unoccupiedToOccupiedThreshold){
-				occCounter=0;
-				P0ICON=1;
-				if (unoccupiedToOccupied == 0){
-					occupancyOn();
-				} else {
-					osal_start_timerEx( mainAppTaskId, OCCUPANCY_ON, unoccupiedToOccupied*(uint32)1000 );
-				}
-			}
+	if (SENSOR_IF){
+		if (SENSOR_IPORT == 0){
+			SENSOR_IPORT=1;
 		} else{
-			if (occupiedToUnoccupied == 0){
-				occupancyOff();
-			} else {
-				osal_start_timerEx( mainAppTaskId, OCCUPANCY_OFF, occupiedToUnoccupied*(uint32)1000 );
-			}
-			P0ICON=0;
+			SENSOR_IPORT=0;
 		}
 	}
-	P0IFG=0;
-	P0IF=0;
+	SENSOR_IF=0;
 	HAL_EXIT_ISR();
 }
